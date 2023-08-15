@@ -23,14 +23,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ssl_stream = connector.connect("localhost", tcp_stream).unwrap();
 
     // Get a Tcp stream out from the connector.
-    let tcp_config_after_connect = ssl_stream.get_ref();
+    let tcp_stream_after_connect = ssl_stream.get_ref();
     // Set a nonblocking for read operations (optional), Must be done here not before connect.
-    tcp_config_after_connect.set_nonblocking(true).unwrap();
+    tcp_stream_after_connect.set_nonblocking(true).unwrap();
+ 
 
     let ssl_stream = Arc::new(Mutex::new(ssl_stream));
+
     // Clone ssl_stream for tx and rx operations.
     let ssl_stream_rx = ssl_stream.clone();
     let ssl_stream_wr = ssl_stream.clone();
+   
 
     // Perform read operations on the SSL stream
     let _ = thread::Builder::new().name("receiver_thread".to_string()).spawn(move || loop {
@@ -55,6 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         if !rx_payload.is_empty() {
+
             println!("{}", rx_payload);
         }
         thread::sleep(Duration::from_millis(100));
@@ -71,14 +75,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap();
         thread::sleep(Duration::from_secs(1));
     });
-    
+
+
         // Register the CTRL+C signal handler
         set_handler(move || {
             println!(
                 "{}",
                 "\r\nCTRL+C signal received. Terminating..."
                     .red()
-                    .bold()
                     .underline()
             );
             std::process::exit(0);
@@ -90,3 +94,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         thread::sleep(Duration::from_secs(10));
     }
 }
+
