@@ -22,8 +22,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Wrap the TcpStream in an SSL stream.
     let ssl_stream = connector.connect("localhost", tcp_stream).unwrap();
 
-    // Set a timeout for read operations (optional).
+    // Get a Tcp stream out from the connector.
     let tcp_config_after_connect = ssl_stream.get_ref();
+    // Set a nonblocking for read operations (optional), Must be done here not before connect.
     tcp_config_after_connect.set_nonblocking(true).unwrap();
 
     let ssl_stream = Arc::new(Mutex::new(ssl_stream));
