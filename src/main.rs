@@ -87,6 +87,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
 
     loop {
-        thread::sleep(Duration::from_millis(10));
+        thread::sleep(Duration::from_secs(10));
     }
 }
